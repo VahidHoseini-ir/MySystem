@@ -1,5 +1,4 @@
-# MySystem
-# system i set up in project to easy use of them
+# system I set up in project to easy use of them
 
 ## How you should use it below code 
 its just for having your ads system and updating system 
