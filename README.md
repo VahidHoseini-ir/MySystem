@@ -11,6 +11,8 @@ but for external ads if you want to turn it on you should make a methode like be
 // and of course add intialize ads external in oncreat method of your main activity : 
 //       MagnetSDK.initialize(getApplicationContext());
 //       MagnetSDK.getSettings();
+// in you oncreat activities set : conf.currentActivity = this; 
+// and do the same for your onResume method.
 
     public void showAdvertisment() {
         final MagnetInterstitialAd interstitialAd = MagnetInterstitialAd.create(getApplicationContext());
