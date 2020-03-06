@@ -28,10 +28,6 @@ public class conf extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("yekan.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build());
 
     }
 
