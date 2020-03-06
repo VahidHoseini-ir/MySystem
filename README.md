@@ -17,26 +17,22 @@ but for external ads if you want to turn it on you should make a methode like be
         interstitialAd.setAdLoadListener(new MagnetAdLoadListener() {
             @Override
             public void onPreload(int price, String currency) {
-                // این تابع برای میانی فراخوانی نمی‌شود.
             }
 
             @Override
             public void onReceive() {
-                //زمانی که تبلیغ دریافت می‌شود این تابع فراخوانی می‌شود و از این زمان می‌توانید تبلیغ را نمایش دهید.
                 interstitialAd.show();
             }
 
             @Override
             public void onFail(int errorCode, String errorMessage) {
-                //زمانی که دریافت و نمایش تبلیغ به مشکل برمی‌خورد این تابع فراخوانی می‌شود .
             }
 
             @Override
             public void onClose() {
-                // زمانی که تبلیغ توسط کاربر بسته می‌شود، این تابع فراخوانی می‌شود.
             }
         });
-        interstitialAd.load("455f68157d9e08d78613c9808cac5bb5");
+        interstitialAd.load("your hash code");
     }
 ```
 
