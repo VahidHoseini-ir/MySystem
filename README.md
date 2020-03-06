@@ -1,7 +1,7 @@
 # system I set up in project to easy use of them
 
-## How you should use it below code 
-its just for having your ads system and updating system 
+## How you should use this system :
+for having your ads system and updating system 
 ```java
 new NetworkClient(this).setControlApp();
 ```
