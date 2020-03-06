@@ -1,0 +1,73 @@
+{
+  "Update": [
+    {
+      "app_id": "ir.vahidhoseini.callrecorder",
+      "updateable": true,
+      "title": "Update is available",
+      "desc": "- more performancing on recording audio \n- more beautifull user interface",
+      "url_download": "https://vahidhoseini.ir/apps/download/"
+    },
+    {
+      "app_id": "ir.vahidhoseini.modinet",
+      "updateable": false,
+      "title": "بروز رسانی اپلیکیشن مدینت",
+      "desc": "بهبود عملکرد کلی برنامه",
+      "url_download": "https://vahidhoseini.ir/apps/download/"
+    }
+  ],
+  "AppAds": {
+    "ActivatingExAds": false,
+    "ActivatingMyAds": true,
+    "ActivatingGlobalAd": false,
+    "MyAds": {
+      "WhichApp": [
+        {
+          "app_id": "ir.vahidhoseini.callrecorder",
+          "activating": true
+        },
+        {
+          "app_id": "ir.vahidhoseini.modinet",
+          "activating": true
+        }
+      ],
+      "ListAds": [
+        {
+          "id": "ir.vahidhoseini.callrecorder",
+          "title": "Auto Call Recording",
+          "color_title": "#ffffff",
+          "url_photo": "http://vahidhoseini.ir/apps/appbanner/blue_gradient.jpg",
+          "color_btn": "#051a34",
+          "url_action": "https://cafebazaar.ir/app/ir.vahidhoseini.callrecorder",
+          "text_url_action": "Install Now"
+        },
+        {
+          "id": "ir.vahidhoseini.modinet",
+          "title": "A way to block access to the internet per application",
+          "color_title": "#ffffff",
+          "url_photo": "http://vahidhoseini.ir/apps/appbanner/modinet_banner.jpg",
+          "color_btn": "#151743",
+          "url_action": "https://play.google.com/store/apps/details?id=ir.vahidhoseini.modinet",
+          "text_url_action": "Install Now"
+        },
+        {
+          "id": "3",
+          "title": "Mahno Persian Calendare",
+          "color_title": "#ffffff",
+          "url_photo": "http://vahidhoseini.ir/apps/appbanner/blue_gradient.jpg",
+          "color_btn": "#051a34",
+          "url_action": "https://cafebazaar.ir/app/app.hpbyp.vh.calendar",
+          "text_url_action": "Install Now"
+        }
+      ],
+      "GlobalAd": {
+         "id": "3",
+          "title": "Mahno Persian Calendare",
+          "color_title": "#ffffff",
+          "url_photo": "http://vahidhoseini.ir/apps/appbanner/blue_gradient.jpg",
+          "color_btn": "#051a34",
+          "url_action": "https://cafebazaar.ir/app/app.hpbyp.vh.calendar",
+          "text_url_action": "Install Now"
+      }
+    }
+  }
+}
