@@ -13,8 +13,8 @@ but for external ads if you want to turn it on you should make a methode like be
 //       MagnetSDK.getSettings();
 // in you oncreat activities set : conf.currentActivity = this; 
 // and do the same for your onResume method.
-
-    public void showAdvertisment() {
+// in NetworkClient class you need to add you hash code for externall ads
+    public void showExAds() {
         final MagnetInterstitialAd interstitialAd = MagnetInterstitialAd.create(getApplicationContext());
         interstitialAd.setAdLoadListener(new MagnetAdLoadListener() {
             @Override
