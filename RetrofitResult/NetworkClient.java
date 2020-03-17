@@ -1,41 +1,32 @@
-package ir.vahidhoseini.callrecorder.RetrofitResult;
+package eu.faircode.netguard.RetrofitResult;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Handler;
-import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.airbnb.lottie.LottieAnimationView;
-import com.airbnb.lottie.LottieComposition;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.magnetadservices.sdk.MagnetAdLoadListener;
+import com.magnetadservices.sdk.MagnetInterstitialAd;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-import ir.vahidhoseini.callrecorder.BuildConfig;
-import ir.vahidhoseini.callrecorder.MainActivity;
-import ir.vahidhoseini.callrecorder.R;
-import ir.vahidhoseini.callrecorder.Splash_Activity;
-import ir.vahidhoseini.callrecorder.SqliteDatabase.DatabaseHelper;
-import ir.vahidhoseini.callrecorder.adapter.IncommingAdapter;
-import ir.vahidhoseini.callrecorder.conf;
+import eu.faircode.netguard.ApplicationEx;
+import eu.faircode.netguard.BuildConfig;
+import eu.faircode.netguard.R;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,26 +39,18 @@ public class NetworkClient {
 
     public NetworkClient(Activity currentActivity) {
         this.currentActivity = currentActivity;
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS).build();
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BuildConfig.app_management)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
     }
 
-    /*
-    This public static method will return Retrofit client
-    anywhere in the appplication
-    */
-    public Retrofit getRetrofitClient() {
-        //If condition to ensure we don't create multiple retrofit instances in a single application
-        if (retrofit == null) {
-            //Defining the Retrofit using Builder
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BuildConfig.app_management) //This is the only mandatory call on Builder object.
-                    .addConverterFactory(GsonConverterFactory.create()) // Convertor library used to convert response into POJO
-                    .build();
-        }
-        return retrofit;
-    }
 
     public void setControlApp() {
-        Retrofit retrofit = getRetrofitClient();
         AppManagerApi managerApi = retrofit.create(AppManagerApi.class);
         Call<ManagingApps> call = managerApi.getManagmentData();
         call.enqueue(new Callback<ManagingApps>() {
@@ -75,56 +58,119 @@ public class NetworkClient {
             public void onResponse(Call<ManagingApps> call, Response<ManagingApps> response) {
                 if (response.body() != null) {
                     ManagingApps managingApps = response.body();
-                    ManagingApps.AppAds appAds = managingApps.getAppads();
                     List<ManagingApps.update> app_update_list = managingApps.getAppUpdate();
                     for (int i = 0; i < app_update_list.size(); i++) {
-                        if (BuildConfig.APPLICATION_ID.equals(app_update_list.get(i).app_id)) {
-                            showNotifUpdate(app_update_list.get(i).getTitle(), app_update_list.get(i).getDesc(), app_update_list.get(i).getUpdateable(), app_update_list.get(i).getUrl_download());
+                        if (BuildConfig.APPLICATION_ID.equals(app_update_list.get(i).getApp_id())) {
+                            if (BuildConfig.VERSION_CODE < app_update_list.get(i).version_code()) {
+                                showNotifUpdate(app_update_list.get(i).getTitle(),
+                                        app_update_list.get(i).getDesc(),
+                                        app_update_list.get(i).getUpdateable(),
+                                        app_update_list.get(i).getUrl_download());
+                            }
                         }
                     }
-                    conf.ActivatingExAds = appAds.getActivatingExAds();
-                    conf.ActivatingGlobalAd = appAds.getActivatingGlobalAd();
-                    conf.ActivatingMyAds = appAds.getActivatingMyAds();
-                    if (conf.ActivatingMyAds) {
-                        List<ManagingApps.AppAds.MyAds.WhichApp> whichAppShowAds = appAds.getMyads().getWhichApps();
-                        List<ManagingApps.AppAds.MyAds.ListAds> ListAds = appAds.getMyads().getListAds();
-                        for (int i = 0; i < whichAppShowAds.size(); i++) {
-                            if (BuildConfig.APPLICATION_ID.equals(whichAppShowAds.get(i).getApp_id())) {
-                                conf.ActivatingMyAds = whichAppShowAds.get(i).getActivating();
-                            }
-                        }
-                        for (int i = 0; i < ListAds.size(); i++) {
-                            if (BuildConfig.APPLICATION_ID.equals(ListAds.get(i).getid())) {
-                                ListAds.remove(i);
-                            }
-                        }
-                        int randomAds = new Random().nextInt(ListAds.size());
-                        showMyAds(ListAds.get(randomAds).gettitle(), ListAds.get(randomAds).getColorTitle(), ListAds.get(randomAds).geturl_photo(), ListAds.get(randomAds).getColorBtn(), ListAds.get(randomAds).geturl_action(), ListAds.get(randomAds).gettext_url_action());
-                    } else if (conf.ActivatingGlobalAd) {
-                        ManagingApps.AppAds.MyAds.GlobalAds globalAds = appAds.getMyads().getGlobalAds();
-                        showMyAds(globalAds.gettitle(), globalAds.getColor_title(), globalAds.geturl_photo(), globalAds.getColor_btn(), globalAds.geturl_action(), globalAds.gettext_url_action());
 
-                    } else if (conf.ActivatingExAds) {
-                        if (conf.currentActivity == currentActivity)
-                            ((MainActivity) currentActivity).showAdvertisment();
+                    boolean app_can_show_ex_ads = false;
+                    boolean app_can_show_my_random_ads = false;
+
+                    List<ManagingApps.ListAds> ListAds = managingApps.getListAds();
+                    for (int i = 0; i < ListAds.size(); i++) { //
+                        if (BuildConfig.APPLICATION_ID.equals(ListAds.get(i).get_id_app())) {
+                            if (!isAppInstalled(ListAds.get(i).get_id_app_ads()) && ListAds.get(i).get_id_app_ads().contains(".")) {
+                                app_can_show_ex_ads = false;
+                                app_can_show_my_random_ads = false;
+//                                Log.e("tag", "app_management value a:" + specific_ads_for_specific_apps + random_ads);
+                                if (ListAds.get(i).get_activating_my_ads()) {
+                                    showMyAds(ListAds.get(i).get_title(),
+                                            ListAds.get(i).get_color_title(),
+                                            ListAds.get(i).get_url_photo(),
+                                            ListAds.get(i).get_color_btn(),
+                                            ListAds.get(i).get_url_action(),
+                                            ListAds.get(i).get_text_url_action());
+                                } else if (ListAds.get(i).get_activating_ex_ads()) {
+                                    showExAds();
+                                }
+                                break;
+                            } else {
+                                app_can_show_ex_ads = ListAds.get(i).get_activating_ex_ads();
+                                app_can_show_my_random_ads = ListAds.get(i).get_activating_my_ads();
+//                                Log.e("TAG", "app_management ads:" + ListAds.get(i).get_title() + "\n" +
+//                                        ListAds.get(i).get_color_title() + "\n" +
+//                                        ListAds.get(i).get_url_photo() + "\n" +
+//                                        ListAds.get(i).get_color_btn() + "\n" +
+//                                        ListAds.get(i).get_url_action() + "\n" +
+//                                        ListAds.get(i).get_text_url_action());
+//                                Log.e("tag", "app_management value app_can_show_ex_ads :" + app_can_show_ex_ads + "app_can_show_ex_ads :" + app_can_show_my_random_ads);
+                                ListAds.remove(i);
+
+                                break;
+                            }
+                        } else {
+                            app_can_show_my_random_ads = true;
+//                            Log.e("tag", "app_management value app_can_show_ex_ads :" + app_can_show_ex_ads + "app_can_show_ex_ads :" + app_can_show_my_random_ads);
+                        }
                     }
-//                    ManagingApps.AppAds appads = managingApps.getAppads();
-//                    ManagingApps.AppAds.MyAds appAds = appads.getMyads();
-//                    Log.e("tag", "app_management data:" + appads.getMyads().listAds.get(1).getdesc());
+                    if (app_can_show_my_random_ads) {
+                        for (int j = ListAds.size() - 1; j >= 0; j--) {
+                            if (isAppInstalled(ListAds.get(j).get_id_app_ads())) {
+                                ListAds.remove(j);
+                            }
+                        }
+                        if (ListAds.size() > 0) {
+                            int randomAds = new Random().nextInt(ListAds.size());//select random of my ads
+                            showMyAds(ListAds.get(randomAds).get_title(),
+                                    ListAds.get(randomAds).get_color_title(),
+                                    ListAds.get(randomAds).get_url_photo(),
+                                    ListAds.get(randomAds).get_color_btn(),
+                                    ListAds.get(randomAds).get_url_action(),
+                                    ListAds.get(randomAds).get_text_url_action());
+                        } else {
+                            showExAds();
+                        }
+                    } else {
+                        if (app_can_show_ex_ads) {
+                            showExAds();
+                        }
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.e("tag", "app_management data: " + t.toString());
-
+                showExAds();
             }
         });
 
     }
 
+    public void showExAds() {
+        final MagnetInterstitialAd interstitialAd = MagnetInterstitialAd.create(currentActivity.getApplicationContext());
+        interstitialAd.setAdLoadListener(new MagnetAdLoadListener() {
+            @Override
+            public void onPreload(int price, String currency) {
+            }
+
+            @Override
+            public void onReceive() {
+                interstitialAd.show();
+            }
+
+            @Override
+            public void onFail(int errorCode, String errorMessage) {
+            }
+
+            @Override
+            public void onClose() {
+            }
+        });
+        interstitialAd.load("d6d10081772608d7b043f502b6208f75");
+
+
+    }
+
     private void showMyAds(String gettitle, String getColorTitle, String geturl_photo, String getColorBtn, String geturl_action, String gettext_url_action) {
-        final Dialog dialog = new Dialog(conf.currentActivity);
+        final Dialog dialog = new Dialog(ApplicationEx.currentActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_app_ads);
         dialog.setCancelable(true);
@@ -140,7 +186,7 @@ public class NetworkClient {
         ads_btn.setBackgroundColor(Color.parseColor(getColorBtn));
         ads_btn.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(geturl_action));
-            conf.currentActivity.startActivity(browserIntent);
+            ApplicationEx.currentActivity.startActivity(browserIntent);
         });
         ads_close.setOnClickListener(v -> {
             dialog.dismiss();
@@ -148,7 +194,7 @@ public class NetworkClient {
         });
 
 
-        Picasso.with(conf.context).load(geturl_photo).into(ads_background, new com.squareup.picasso.Callback() {
+        Picasso.with(ApplicationEx.context).load(geturl_photo).into(ads_background, new com.squareup.picasso.Callback() {
             @Override
             public void onSuccess() {
                 dialog.show();
@@ -165,7 +211,7 @@ public class NetworkClient {
 
     private void showNotifUpdate(String title, String desc, boolean updateable, String url_download) {
         if (updateable) {
-            final Dialog dialog = new Dialog(conf.currentActivity);
+            final Dialog dialog = new Dialog(ApplicationEx.currentActivity);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_app_update);
             dialog.setCancelable(true);
@@ -183,8 +229,23 @@ public class NetworkClient {
             btn_netgativ.setOnClickListener(v -> dialog.cancel());
             btn_positive.setOnClickListener(v -> {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url_download));
-                conf.currentActivity.startActivity(browserIntent);
+                ApplicationEx.currentActivity.startActivity(browserIntent);
             });
+        }
+    }
+
+    public boolean isAppInstalled(String package_name) {
+        if (BuildConfig.APPLICATION_ID.equals(package_name)) {
+            return true;
+        }
+
+        try {
+            PackageManager pm = ApplicationEx.context.getPackageManager();
+            PackageInfo info = pm.getPackageInfo("" + package_name, PackageManager.GET_META_DATA);
+            return true;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
     }
 
