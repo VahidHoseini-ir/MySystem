@@ -164,7 +164,7 @@ public class NetworkClient {
             public void onClose() {
             }
         });
-        interstitialAd.load("455f68157d9e08d78613c9808cac5bb5");
+        interstitialAd.load("your hash code");
 
 
     }
