@@ -19,9 +19,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 public class conf extends Application {
     public static Context context;
     public static Activity currentActivity;
-    public static boolean ActivatingExAds = false;
-    public static boolean ActivatingMyAds = false;
-    public static boolean ActivatingGlobalAd = false;
 
 
     @Override
