@@ -1,4 +1,4 @@
-package eu.faircode.netguard.RetrofitResult;
+package ir.vahidhoseini.callrecorder.RetrofitResult;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -7,13 +7,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.magnetadservices.sdk.MagnetAdLoadListener;
 import com.magnetadservices.sdk.MagnetInterstitialAd;
@@ -23,9 +22,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import eu.faircode.netguard.ApplicationEx;
-import eu.faircode.netguard.BuildConfig;
-import eu.faircode.netguard.R;
+import ir.vahidhoseini.callrecorder.BuildConfig;
+import ir.vahidhoseini.callrecorder.R;
+import ir.vahidhoseini.callrecorder.RetrofitResult.AppManagerApi;
+import ir.vahidhoseini.callrecorder.RetrofitResult.ManagingApps;
+import ir.vahidhoseini.callrecorder.conf;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -134,7 +135,6 @@ public class NetworkClient {
                     }
                 }
             }
-
             @Override
             public void onFailure(Call call, Throwable t) {
                 Log.e("tag", "app_management data: " + t.toString());
@@ -164,13 +164,13 @@ public class NetworkClient {
             public void onClose() {
             }
         });
-        interstitialAd.load("d6d10081772608d7b043f502b6208f75");
+        interstitialAd.load("455f68157d9e08d78613c9808cac5bb5");
 
 
     }
 
     private void showMyAds(String gettitle, String getColorTitle, String geturl_photo, String getColorBtn, String geturl_action, String gettext_url_action) {
-        final Dialog dialog = new Dialog(ApplicationEx.currentActivity);
+        final Dialog dialog = new Dialog(conf.currentActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_app_ads);
         dialog.setCancelable(true);
@@ -186,7 +186,7 @@ public class NetworkClient {
         ads_btn.setBackgroundColor(Color.parseColor(getColorBtn));
         ads_btn.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(geturl_action));
-            ApplicationEx.currentActivity.startActivity(browserIntent);
+            conf.currentActivity.startActivity(browserIntent);
         });
         ads_close.setOnClickListener(v -> {
             dialog.dismiss();
@@ -194,7 +194,7 @@ public class NetworkClient {
         });
 
 
-        Picasso.with(ApplicationEx.context).load(geturl_photo).into(ads_background, new com.squareup.picasso.Callback() {
+        Picasso.with(conf.context).load(geturl_photo).into(ads_background, new com.squareup.picasso.Callback() {
             @Override
             public void onSuccess() {
                 dialog.show();
@@ -211,7 +211,7 @@ public class NetworkClient {
 
     private void showNotifUpdate(String title, String desc, boolean updateable, String url_download) {
         if (updateable) {
-            final Dialog dialog = new Dialog(ApplicationEx.currentActivity);
+            final Dialog dialog = new Dialog(conf.currentActivity);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_app_update);
             dialog.setCancelable(true);
@@ -229,7 +229,7 @@ public class NetworkClient {
             btn_netgativ.setOnClickListener(v -> dialog.cancel());
             btn_positive.setOnClickListener(v -> {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url_download));
-                ApplicationEx.currentActivity.startActivity(browserIntent);
+                conf.currentActivity.startActivity(browserIntent);
             });
         }
     }
@@ -240,7 +240,7 @@ public class NetworkClient {
         }
 
         try {
-            PackageManager pm = ApplicationEx.context.getPackageManager();
+            PackageManager pm = conf.context.getPackageManager();
             PackageInfo info = pm.getPackageInfo("" + package_name, PackageManager.GET_META_DATA);
             return true;
 
